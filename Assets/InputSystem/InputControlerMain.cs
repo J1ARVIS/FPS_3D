@@ -56,6 +56,15 @@ namespace FPS.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Run"",
+                    ""type"": ""Button"",
+                    ""id"": ""73270497-1095-41ad-995c-945044ec9732"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -190,6 +199,17 @@ namespace FPS.Input
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1e40605f-d973-459f-9267-469839ee6ce4"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard + Mouse"",
+                    ""action"": ""Run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -218,6 +238,7 @@ namespace FPS.Input
             m_Player_Walk = m_Player.FindAction("Walk", throwIfNotFound: true);
             m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
             m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
+            m_Player_Run = m_Player.FindAction("Run", throwIfNotFound: true);
         }
 
         ~@InputControlerMain()
@@ -287,6 +308,7 @@ namespace FPS.Input
         private readonly InputAction m_Player_Walk;
         private readonly InputAction m_Player_Jump;
         private readonly InputAction m_Player_Look;
+        private readonly InputAction m_Player_Run;
         public struct PlayerActions
         {
             private @InputControlerMain m_Wrapper;
@@ -294,6 +316,7 @@ namespace FPS.Input
             public InputAction @Walk => m_Wrapper.m_Player_Walk;
             public InputAction @Jump => m_Wrapper.m_Player_Jump;
             public InputAction @Look => m_Wrapper.m_Player_Look;
+            public InputAction @Run => m_Wrapper.m_Player_Run;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -312,6 +335,9 @@ namespace FPS.Input
                 @Look.started += instance.OnLook;
                 @Look.performed += instance.OnLook;
                 @Look.canceled += instance.OnLook;
+                @Run.started += instance.OnRun;
+                @Run.performed += instance.OnRun;
+                @Run.canceled += instance.OnRun;
             }
 
             private void UnregisterCallbacks(IPlayerActions instance)
@@ -325,6 +351,9 @@ namespace FPS.Input
                 @Look.started -= instance.OnLook;
                 @Look.performed -= instance.OnLook;
                 @Look.canceled -= instance.OnLook;
+                @Run.started -= instance.OnRun;
+                @Run.performed -= instance.OnRun;
+                @Run.canceled -= instance.OnRun;
             }
 
             public void RemoveCallbacks(IPlayerActions instance)
@@ -356,6 +385,7 @@ namespace FPS.Input
             void OnWalk(InputAction.CallbackContext context);
             void OnJump(InputAction.CallbackContext context);
             void OnLook(InputAction.CallbackContext context);
+            void OnRun(InputAction.CallbackContext context);
         }
     }
 }

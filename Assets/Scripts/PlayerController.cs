@@ -14,8 +14,9 @@ namespace FPS.Core
         [SerializeField] private float _minRotationBound;
         [SerializeField] private float _maxRotationBound;
         [Space]
-        [Header("Move")]
+        [Header("Move & Run")]
         [SerializeField] private float _moveSpeed;
+        [SerializeField] private float _runMultiplier;
         [Space]
         [Header("Jump")]
         [SerializeField] private float _jumpPower;
@@ -26,6 +27,8 @@ namespace FPS.Core
         private float _xRotation;
         private float _yRotation;
 
+        private float _moveSpeedFinal;
+
         private void Awake()
         {
             _inputControler = new InputControlerMain();
@@ -33,7 +36,6 @@ namespace FPS.Core
 
             _inputControler.Player.Jump.performed += Jump;
         }
-
         private void Jump(InputAction.CallbackContext context)
         {
             if (IsGrounded())
@@ -48,7 +50,6 @@ namespace FPS.Core
             Debug.DrawLine(rayOrigin, rayOrigin + Vector3.down * _groundCheckDistance, Color.red);
             return Physics.Raycast(rayOrigin, Vector3.down, _groundCheckDistance);
         }
-
         private void Update()
         {
             Look();
@@ -65,19 +66,33 @@ namespace FPS.Core
 
             _lookTarget.transform.localRotation = Quaternion.Euler(_yRotation, _xRotation, 0f);
         }
-
         private void FixedUpdate()
         {
-            if (IsGrounded()) Move();
+            if (IsGrounded())
+            {
+                CalcMoveSpeed();
+                Move();
+            }
+        }
+        private void CalcMoveSpeed()
+        {
+            _moveSpeedFinal = _moveSpeed;
+            Run();
         }
         private void Move()
         {
             var moveDirection = _inputControler.Player.Walk.ReadValue<Vector2>();
 
-            var velocityByInput = new Vector3(moveDirection.x, 0f, moveDirection.y) * _moveSpeed * Time.fixedDeltaTime;
+            var velocityByInput = new Vector3(moveDirection.x, 0f, moveDirection.y) * _moveSpeedFinal * Time.fixedDeltaTime;
             var relativeVelocity = _lookTarget.transform.TransformDirection(velocityByInput);
 
             _moveTarget.velocity = new Vector3(relativeVelocity.x, _moveTarget.velocity.y, relativeVelocity.z);
+        }
+        private void Run()
+        {
+            bool isRunning = _inputControler.Player.Run.IsPressed();
+
+            if (isRunning) _moveSpeedFinal = _moveSpeed * _runMultiplier;
         }
         private void OnEnable()
         {
